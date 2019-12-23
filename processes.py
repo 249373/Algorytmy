@@ -1,42 +1,60 @@
 class Process:
     def __init__(self, tab):
-        self.start_time = None
-        self.end_time = None
-        self.current_necessary_time = int(tab[0])
-        self.necessary_time = int(tab[0])# potrzebny czas do wykonania
-        self.arrival = int(tab[1])  # moment przybycia
-        self.priority = int(tab[2])  # priorytet
-        self.duration_time = None
-        self.start = True
-        self.wait_time = None
+        self.__start_time = None
+        self.__end_time = None
+        self.__current_necessary_time = int(tab[0])
+        self.__necessary_time = int(tab[0])# potrzebny czas do wykonania
+        self.__arrival = int(tab[1])  # moment przybycia
+        self.__priority = int(tab[2])  # priorytet
+        self.__duration_time = None
+        self.__start = True
+        self.__wait_time = 0
         return
 
+    @property
+    def get_arrival(self):
+        return int(self.__arrival)
+
+    @property
+    def get_wait(self):
+        return self.__wait_time
+
+    @property
+    def get_necessary(self):
+        return self.__necessary_time
+
+    @property
+    def get_current_necessary(self):
+        return self.__current_necessary_time
+
+
     def display(self):
-        print(self.current_necessary_time)
-        print(self.arrival)
-        print(self.priority)
+        print(self.__necessary_time, end='              ')
+        print(self.__arrival, end='         ')
+        print(self.__priority, end='         ')
+        print(self.__start_time, end='      ')
+        print(self.__end_time, end='     ')
+        print(self.__wait_time, end='           ')
+        print(self.__current_necessary_time)
 
     def is_not_int(self):
-        if isinstance(self.current_necessary_time, int) and isinstance(self.arrival, int) and isinstance(self.priority, int):
+        if isinstance(self.__current_necessary_time, int) and isinstance(self.__arrival, int) and isinstance(self.__priority, int):
             return False
         else:
             return True
 
     def is_below_0(self):
-        if self.current_necessary_time < 0 or self.arrival < 0 or self.priority < 0:
+        if self.__current_necessary_time < 0 or self.__arrival < 0 or self.__priority < 0:
             return True
         else:
             return False
 
-    def get_arrival(self):
-        return self.arrival
-
     def do_step(self, time):
-        if self.start:
-            self.start_time = time-1
-            self.start = False
-        self.current_necessary_time = self.current_necessary_time - 1
-        if self.current_necessary_time == 0:
-            self.end_time = time
-            self.wait_time = self.end_time - self.arrival - self.necessary_time
+        if self.__start:
+            self.__start_time = time - 1
+            self.__start = False
+        self.__current_necessary_time = self.__current_necessary_time - 1
+        if self.__current_necessary_time == 0:
+            self.__end_time = time
+            self.__wait_time = self.__end_time - self.__arrival - self.__necessary_time
         return
