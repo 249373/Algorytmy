@@ -9,6 +9,7 @@ class Process:
         self.__duration_time = None
         self.__start = True
         self.__wait_time = 0
+        self.is_finished = False
         return
 
     @property
@@ -27,6 +28,14 @@ class Process:
     def get_current_necessary(self):
         return self.__current_necessary_time
 
+    @property
+    def get_priority(self):
+        return self.__priority
+
+    @property
+    def decrease_priority(self):
+        self.__priority -= 1
+        return
 
     def display(self):
         print(self.__necessary_time, end='              ')
@@ -36,6 +45,7 @@ class Process:
         print(self.__end_time, end='     ')
         print(self.__wait_time, end='           ')
         print(self.__current_necessary_time)
+        return
 
     def is_not_int(self):
         if isinstance(self.__current_necessary_time, int) and isinstance(self.__arrival, int) and isinstance(self.__priority, int):
@@ -57,4 +67,5 @@ class Process:
         if self.__current_necessary_time == 0:
             self.__end_time = time
             self.__wait_time = self.__end_time - self.__arrival - self.__necessary_time
+            self.is_finished = True
         return

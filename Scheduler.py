@@ -4,6 +4,7 @@ from typing import List, Any
 import copy
 from processes import Process
 
+
 class Scheduler:
     def __init__(self):
         self.__time = 0
@@ -75,15 +76,44 @@ class Scheduler:
                 j -= 1
         return
 
+    def sort_priority(self):
+        for i in range(len(self.__que)):
+            j = len(self.__que) - 1
+            while i < j:
+                if self.__que[j - 1].get_priority > self.__que[j].get_priority:
+                    tmp = self.__que[j]
+                    self.__que[j] = self.__que[j - 1]
+                    self.__que[j - 1] = tmp
+                j -= 1
+        return
+
+    def aging_priorities(self):
+        for i in range(len(self.__que)):
+            if self.__que[i].get_arrival > self.__time:
+                if self.__que[i].get_wait > (9/10)*self.__time:
+                    self.__que[i].decrease_priority()
+
     def run(self):
         average_wait: float = 0.0
 
-        for process in self.__que: #SCFS and SJF
-            while 0 < process.get_current_necessary:
+        algorithm_completed = False
+        while not algorithm_completed:
+            algorithm_completed = True
+            touch_process = False
+            for process in self.__que: #SCFS and SJF
+                if not process.is_finished:
+                    algorithm_completed = False
                 if process.get_arrival < self.__time:
-                    process.do_step(self.__time)
+                    while 0 < process.get_current_necessary:
+                        process.do_step(self.__time)
+                        self.__time += 1
+                        touch_process = True
+                    average_wait += process.get_wait
+                    self.aging_priorities()
+            if not touch_process:
                 self.__time += 1
-            average_wait += process.get_wait
+
+
 
         average_wait /= len(self.__que)
         print("Average wait time: {}ms".format(average_wait))
