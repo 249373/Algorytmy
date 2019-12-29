@@ -37,6 +37,10 @@ class Process:
         self.__priority -= 1
         return
 
+    @property
+    def get_end(self):
+        return self.__end_time
+
     def display(self):
         print(self.__necessary_time, end='              ')
         print(self.__arrival, end='         ')
@@ -54,7 +58,7 @@ class Process:
             return True
 
     def is_below_0(self):
-        if self.__current_necessary_time < 0 or self.__arrival < 0 or self.__priority < 0:
+        if self.__current_necessary_time <= 0 or self.__arrival <= 0 or self.__priority <= 0:
             return True
         else:
             return False
