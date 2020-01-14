@@ -7,9 +7,7 @@ from processes import Process
 
 scheduler = Scheduler()
 scheduler.load_data_from_file()
-scheduler.run_priority()
-scheduler.que_print()
-
+scheduler.run_round_robin(10)
 
 
 # try:
