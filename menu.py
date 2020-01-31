@@ -35,10 +35,10 @@ try:
                 scheduler.run_priority()
                 incorrect_choice = False
             if tmp == 'F':
-                scheduler.run_FCFS()
+                scheduler.run_SJF()
                 incorrect_choice = False
             if tmp == 'C':
-                scheduler.run_SJF()
+                scheduler.run_FCFS()
                 incorrect_choice = False
         else:
             print("Wpisz 'P' lub 'F' lub 'C' lub 'R'!")
