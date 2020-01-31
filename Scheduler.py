@@ -12,6 +12,7 @@ class Scheduler:
         self.__average_wait = 0.0
         self.__time = 0
         self.__que = []
+        self.__que_end = []
         self.__end_time = 0
         self.__selected_process = None
 
@@ -92,7 +93,7 @@ class Scheduler:
 
     def que_print(self):
         print("Necessary | Arrival | Priority | Start | End | Wait | CurrentNecessary  ")
-        for process in self.__que:
+        for process in self.__que_end:
             process.display()
         return
 
@@ -103,15 +104,14 @@ class Scheduler:
                     self.__que[i].decrease_priority()
 
     def run_FCFS(self):
-        que = copy.copy(self.__que)
-        self.__selected_process = que[0]
+        self.__selected_process = self.__que[0]
         do_while = True
         while do_while:
             do_while = False
-            for process in que:  # aby w selected było cokolwiek co juz arrival
+            for process in self.__que:  # aby w selected było cokolwiek co juz arrival
                 if process.get_arrival < self.__time and not process.is_finished:
                     self.__selected_process = process
-            for process in que:  # aby w selected by najmniejszy arrival
+            for process in self.__que:  # aby w selected by najmniejszy arrival
                 if process.get_arrival < self.__time and not process.is_finished:
                     if process.get_arrival < self.__selected_process.get_arrival:
                         self.__selected_process = process
@@ -125,11 +125,12 @@ class Scheduler:
                 while not self.__selected_process.is_finished:  # wykonujemy
                     self.__selected_process.do_step(self.__time)
                     self.__time += 1
+                self.__que_end.append(self.__selected_process)
                 self.__average_wait += self.__selected_process.get_wait
                 self.__end_time = self.__selected_process.get_end
             else:
                 self.__time += 1
-            for process in que:  # sprawdzamy czy już wyjśc z while
+            for process in self.__que:  # sprawdzamy czy już wyjśc z while
                 if not process.is_finished:
                     do_while = True
         self.__average_wait /= len(self.__que)
@@ -140,15 +141,14 @@ class Scheduler:
         return
 
     def run_SJF(self):
-        que = copy.copy(self.__que)
-        self.__selected_process = que[0]
+        self.__selected_process = self.__que[0]
         do_while = True
         while do_while:
             do_while = False
-            for process in que:  # aby w selected było cokolwiek co juz arrival i do wykonania
+            for process in self.__que:  # aby w selected było cokolwiek co juz arrival i do wykonania
                 if process.get_arrival < self.__time and not process.is_finished:
                     self.__selected_process = process
-            for process in que:  # aby w selected by najmniejszy current
+            for process in self.__que:  # aby w selected by najmniejszy current
                 if process.get_arrival < self.__time and not process.is_finished:
                     if process.get_current_necessary < self.__selected_process.get_current_necessary:
                         self.__selected_process = process
@@ -167,7 +167,7 @@ class Scheduler:
                 self.__end_time = self.__selected_process.get_end
             else:
                 self.__time += 1
-            for process in que:  # sprawdzamy czy już wyjśc z while
+            for process in self.__que:  # sprawdzamy czy już wyjśc z while
                 if not process.is_finished:
                     do_while = True
         self.__average_wait /= len(self.__que)
@@ -178,15 +178,14 @@ class Scheduler:
         return
 
     def run_priority(self):
-        que = copy.copy(self.__que)
         self.__selected_process = self.__que[0]
         do_while = True
         while do_while:
             do_while = False
-            for process in que:  # aby w selected było cokolwiek co juz arrival i do wykonania
+            for process in self.__que:  # aby w selected było cokolwiek co juz arrival i do wykonania
                 if process.get_arrival < self.__time and not process.is_finished:
                     self.__selected_process = process
-            for process in que:  # aby w selected by najmniejszy priorytet
+            for process in self.__que:  # aby w selected by najmniejszy priorytet
                 if process.get_arrival < self.__time and not process.is_finished:
                     if process.get_priority < self.__selected_process.get_priority:
                         self.__selected_process = process
@@ -200,6 +199,7 @@ class Scheduler:
                 while not self.__selected_process.is_finished:  # wykonujemy
                     self.__selected_process.do_step(self.__time)
                     self.__time += 1
+                self.__que_end.append(self.__selected_process)
                 self.__average_wait += self.__selected_process.get_wait
                 self.__end_time = self.__selected_process.get_end
             else:
@@ -215,41 +215,8 @@ class Scheduler:
         self.que_print()
         return
 
-    def run(self):  # F
-        que = copy.copy(self.__que)
-        average_wait: float = 0.0
-        while len(que) > 0:
-            number_of_selected_process = 0
-            for i in range(0, len(que)):
-                if 0 < que[i].get_current_necessary:
-                    if que[i].get_arrival < que[number_of_selected_process].get_arrival:
-                        number_of_selected_process = i
-            if que[number_of_selected_process].get_arrival < self.__time:
-                while 0 < self.__que[number_of_selected_process].get_current_necessary:
-                    que[number_of_selected_process].do_step(self.__time)
-                    self.__time += 1
-                que.pop([number_of_selected_process])
-                # del que[number_of_selected_process]
-                average_wait += self.__que[number_of_selected_process].get_wait
-                self.__end_time = self.__que[number_of_selected_process].get_end
-            else:
-                self.__time += 1
-
-        print()
-        print("czas po wykonaniu: {}".format(self.__time))
-        average_wait /= len(self.__que)
-        print("Average wait time: {}ms".format(round(average_wait, 2)))
-        print("Finished time: {}ms".format(self.__end_time))
-        self.que_print()
-        return
-
-
     def run_round_robin(self, quantum):
         que = copy.copy(self.__que)
-        count_length = 0
-        for process in que:#sort zeby zacząc od tego co pierwszy arrival
-            count_length += process.get_current_necessary
-        quantum = count_length/(5*len(que))
         for process in que:
             index_min_process = que.index(process)
             for index_process in range(que.index(process),len(que)):
@@ -275,6 +242,7 @@ class Scheduler:
                 if process.get_current_necessary == 0:
                     self.__average_wait += process.get_wait
                     self.__end_time = process.get_end
+                    self.__que_end.append(process)
                     del que[que.index(process)]
         self.__average_wait /= len(self.__que)
         print()
